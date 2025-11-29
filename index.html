@@ -2,40 +2,86 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>영통3동 경희대 주변 맛집 지도</title>
+    <title>영통3동 맛집 지도</title>
 
-    <!-- 네이버 지도 API -->
-    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=9nc9dh5hrw"></script>
+    <!-- Leaflet 지도 라이브러리 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <style>
         body {
             margin: 0;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            background: #f7f7fb;
         }
+
         #map {
             width: 100%;
-            height: 100vh; /* 화면 전체 */
+            height: calc(100vh - 100px); /* 상단 배너 제외 */
+        }
+
+        .title-bar {
+            height: 100px;
+            background: white;
+            border-bottom: 3px solid #5C7AFF;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: relative;
+        }
+
+        .title-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: #334;
+            letter-spacing: -1px;
+            border-left: 6px solid #5C7AFF;
+            padding-left: 15px;
+        }
+
+        .logo-box {
+            width: 80px;
+            height: 80px;
+            background: #ddd;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: #777;
+            border: 2px dashed #aaa;
         }
     </style>
 </head>
 
 <body>
+
+    <!-- 상단 배너 -->
+    <div class="title-bar">
+        <div class="title-text">영통3동 맛집 지도</div>
+        <div class="logo-box">LOGO</div>
+    </div>
+
+    <!-- 지도 영역 -->
     <div id="map"></div>
 
     <script>
-        // 영통3동 좌표
-        const yongtong3 = new naver.maps.LatLng(37.240558, 127.049627);
+        // 영통3동 반달공원 중심 좌표
+        const yongtongCenter = [37.240558, 127.049627];
 
-        // 지도 생성
-        const map = new naver.maps.Map('map', {
-            center: yongtong3,
-            zoom: 15
-        });
+        // 지도 초기화
+        const map = L.map('map').setView(yongtongCenter, 15);
 
-        // 마커 추가
-        new naver.maps.Marker({
-            position: yongtong3,
-            map: map
-        });
+        // 타일(지도 배경)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // 예시 마커 (추후 CSV 데이터로 자동 생성 예정)
+        const exampleMarker = L.marker([37.240558, 127.049627]).addTo(map);
+        exampleMarker.bindPopup("<b>예시 식당</b><br>영통 맛집 테스트.");
     </script>
+
 </body>
 </html>
