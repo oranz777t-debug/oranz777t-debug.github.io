@@ -4,16 +4,10 @@
     <meta charset="UTF-8">
     <title>영통3동 맛집 지도</title>
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-sA+e2nFqepVb0TT0k5X6rF6J0kaqG3wRkP+TTV0xjtk="
-          crossorigin=""/>
+    <!-- Naver 지도 API -->
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=9nc9dh5hrw"></script>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-o9N1j6k6tXKvuUXHppvsm3Z8bLQeN+y9g6E4IQkP4Uo="
-            crossorigin=""></script>
-
+    <!-- 기본 스타일 -->
     <style>
         * {
             margin: 0;
@@ -30,6 +24,7 @@
             height: 90px;
             background: #ffffff;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             padding: 0 32px;
             border-bottom: 4px solid #4C63FF;
@@ -55,6 +50,7 @@
 </head>
 
 <body>
+
     <!-- 상단 헤더 -->
     <div class="header">
         <div class="title">영통3동 맛집 지도</div>
@@ -64,19 +60,20 @@
     <div id="map"></div>
 
     <script>
-        // 중심 좌표: 영통역 근처 반달공원
-        const centerCoord = [37.2295, 127.0472];
+        // 📌 중심 좌표: 영통역 근처 반달공원
+        const centerCoord = new naver.maps.LatLng(37.2295, 127.0472);
 
         // 지도 생성
-        const map = L.map('map').setView(centerCoord, 16);
-
-        // OpenStreetMap 타일 추가
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        const map = new naver.maps.Map('map', {
+            center: centerCoord,
+            zoom: 16,
+            zoomControl: true,
+            mapTypeControl: false
+        });
 
         // 중심 마커는 표시하지 않음
-        // 필요하면 여기에 마커를 추가하면 됨
+        // 필요하면 여기에 다른 마커를 추가하면 됨
     </script>
+
 </body>
 </html>
