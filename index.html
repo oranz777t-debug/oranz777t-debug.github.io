@@ -4,104 +4,95 @@
     <meta charset="UTF-8">
     <title>영통3동 맛집 지도</title>
 
-    <!-- Leaflet CSS/JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Naver 지도 API -->
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=9nc9dh5hrw"></script>
 
-    <!-- 폰트 -->
-    <link href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
-
+    <!-- 기본 스타일 -->
     <style>
-        body { margin:0; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; background:#f6f7fb; }
-        
+        * {
+            margin: 0;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background: #f6f7fb;
+        }
+
         /* 상단 배너 */
         .header {
+            width: 100%;
             height: 90px;
-            background:#fff;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding:0 32px;
-            border-bottom:4px solid #4C63FF;
-            box-shadow:0px 4px 16px rgba(0,0,0,0.05);
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            border-bottom: 4px solid #4C63FF;
+            box-shadow: 0px 4px 16px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 10;
         }
-        .title { font-size:28px; font-weight:700; color:#1a1a1a; border-left:6px solid #4C63FF; padding-left:12px; }
-        .logo-box { width:85px; height:85px; background:#e9e9e9; border:2px dashed #bdbdbd; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#777; font-size:12px; }
 
-        /* 지도 */
-        #map { width:100%; height:calc(100vh - 90px); }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            border-left: 6px solid #4C63FF;
+            padding-left: 12px;
+        }
 
-        /* CSV 업로드 버튼 */
-        #csvUpload { position:absolute; top:100px; left:32px; z-index:1000; background:white; padding:8px 12px; border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,0.15); }
+        /* 로고 박스 */
+        .logo-slot {
+            width: 85px;
+            height: 85px;
+            background: #e9e9e9;
+            border: 2px dashed #bdbdbd;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-size: 12px;
+        }
+
+        /* 지도 영역 */
+        #map {
+            width: 100%;
+            height: calc(100vh - 90px);
+        }
     </style>
 </head>
 
 <body>
+
     <!-- 상단 헤더 -->
     <div class="header">
         <div class="title">영통3동 맛집 지도</div>
-        <div class="logo-box">LOGO</div>
+        <div class="logo-slot">LOGO</div>
     </div>
-
-    <!-- CSV 업로드 -->
-    <input type="file" id="csvUpload" accept=".csv" />
 
     <!-- 지도 -->
     <div id="map"></div>
 
     <script>
-        // 지도 중심 및 범위
-        const bounds = L.latLngBounds([
-            [37.241500, 127.046500], // 남서: 청명역
-            [37.245000, 127.054900]  // 북동: 영통역
-        ]);
+        // 📌 중심 좌표: 청명남로 × 반달로
+        const centerCoord = new naver.maps.LatLng(37.242018, 127.050830);
 
-        const map = L.map('map').fitBounds(bounds).setMaxBounds(bounds);
+        // 지도 생성
+        const map = new naver.maps.Map('map', {
+            center: centerCoord,
+            zoom: 16,
+            zoomControl: true,
+            mapTypeControl: false
+        });
 
-        // 타일
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(map);
-
-        // 중심 마커 (반달공원)
-        L.marker([37.242018, 127.050830]).addTo(map)
-         .bindPopup("<b>반달공원 중심</b>").openPopup();
-
-        // CSV 업로드 이벤트
-        document.getElementById("csvUpload").addEventListener("change", function(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-
-            reader.onload = function(event) {
-                const csvText = event.target.result;
-                const rows = csvText.split("\n").map(r => r.trim());
-                
-                rows.slice(1).forEach(row => { // 첫줄은 헤더
-                    if(!row) return;
-                    const cols = row.split(",");
-                    const name = cols[0];
-                    const lat = parseFloat(cols[1]);
-                    const lng = parseFloat(cols[2]);
-                    const info = cols.slice(3).join(",").replace(/"/g,"");
-
-                    if(!lat || !lng) return;
-
-                    // 마커 생성
-                    const marker = L.marker([lat,lng]).addTo(map);
-
-                    // 카드형 팝업
-                    const popupContent = `
-                        <div style="padding:12px; border-radius:12px; background:white; width:220px;
-                                    font-family: 'Pretendard', sans-serif;
-                                    box-shadow:0 4px 15px rgba(0,0,0,0.2);">
-                            <h4 style="margin:0 0 10px; font-size:18px; font-weight:700; color:#333;">${name}</h4>
-                            <p style="margin:0; font-size:14px; color:#666; line-height:1.4;">${info}</p>
-                        </div>
-                    `;
-                    marker.bindPopup(popupContent);
-                });
-            };
-            reader.readAsText(file,"UTF-8");
+        // 기준 마커 표시
+        new naver.maps.Marker({
+            position: centerCoord,
+            map: map,
+            title: "지도 기준점"
         });
     </script>
+
 </body>
 </html>
